@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const fs = require('fs-extra');
+const fs = require('fs'); // Mudado de fs-extra para fs nativo
 const multer = require('multer');
 const sharp = require('sharp');
 const db = require('./db');
@@ -14,9 +14,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../public')));
 
-// Garantir que a pasta de uploads existe
+// Garantir que a pasta de uploads existe (agora com fs nativo)
 const uploadDir = path.join(__dirname, '../public/uploads');
-fs.ensureDirSync(uploadDir);
+
+// Criar pasta de uploads se não existir (substitui fs-extra)
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+    console.log('📁 Pasta de uploads criada!');
+}
 
 // Configuração do Multer para upload de fotos
 const storage = multer.diskStorage({
@@ -157,7 +162,7 @@ app.post('/api/upload', upload.single('foto'), (req, res) => {
             .jpeg({ quality: 85 })
             .toFile(fotoProcessada)
             .then(() => {
-                // Substituir original pela processada
+                // Substituir original pela processada (com fs nativo)
                 fs.unlinkSync(fotoPath);
                 fs.renameSync(fotoProcessada, fotoPath);
 
@@ -270,9 +275,9 @@ app.delete('/api/admin/itens/:id', (req, res) => {
         if (err) return res.status(500).json({ success: false });
         
         if (results.length > 0 && results[0].foto) {
-            // Deletar arquivo da foto
+            // Deletar arquivo da foto (com fs nativo)
             const fotoPath = path.join(__dirname, '../public', results[0].foto);
-            fs.unlink(fotoPath).catch(() => {});
+            fs.unlink(fotoPath, () => {}); // Versão assíncrona com callback vazio
         }
         
         // Deletar do banco
