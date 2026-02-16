@@ -1,18 +1,27 @@
 const express = require('express');
-const mysql = require('mysql2');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware para servir arquivos estáticos (CSS, imagens, JS)
-app.use(express.static(path.join(__dirname, 'public')));
+// Rota de teste
+app.get('/api/test', (req, res) => {
+    res.json({ 
+        success: true, 
+        message: '✅ API funcionando!',
+        timestamp: new Date().toISOString()
+    });
+});
 
-// Rota principal - serve o arquivo HTML do cardápio
+// Rota principal
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    res.json({ 
+        nome: 'Cardápio Digital API',
+        status: 'online',
+        rotas: ['/api/test']
+    });
 });
 
 // Iniciar servidor
 app.listen(PORT, () => {
-  console.log(`✅ Servidor rodando na porta ${PORT}`);
-  console.log(`📱 Acesse: http://localhost:${PORT}`);
+    console.log(`✅ Servidor rodando na porta ${PORT}`);
+    console.log(`🔧 Teste: /api/test`);
 });
