@@ -1,22 +1,20 @@
-// backend/db.js
 const mysql = require('mysql2');
 require('dotenv').config();
 
-// Railway injeta automaticamente as variáveis MYSQLHOST, MYSQLPORT, etc.
-const db = mysql.createConnection({
-    host: process.env.MYSQLHOST || process.env.DB_HOST || 'localhost',
-    user: process.env.MYSQLUSER || process.env.DB_USER || 'root',
-    password: process.env.MYSQLPASSWORD || process.env.DB_PASSWORD || 'root',
-    database: process.env.MYSQLDATABASE || process.env.DB_NAME || 'cardapio_db',
-    port: process.env.MYSQLPORT || process.env.DB_PORT || 3306
+const connection = mysql.createConnection({
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME
 });
 
-db.connect(err => {
+connection.connect(err => {
     if (err) {
-        console.error('❌ Erro MySQL:', err.message);
-        return;
+        console.error('❌ Erro no banco:', err);
+    } else {
+        console.log('✅ Banco conectado!');
     }
-    console.log('✅ MySQL conectado!');
 });
 
-module.exports = db;
+module.exports = connection;
